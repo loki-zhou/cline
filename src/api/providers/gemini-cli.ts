@@ -71,6 +71,12 @@ export class GeminiCliHandler implements ApiHandler {
 	constructor(options: GeminiCliHandlerOptions) {
 		this.options = options
 		this.authClient = new OAuth2Client(OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REDIRECT_URI)
+
+		// DEBUG: Print constructor options and environment
+		console.log(`[GeminiCLI] DEBUG - Constructor called with options:`)
+		console.log(`[GeminiCLI] DEBUG - geminiCliProjectId:`, options.geminiCliProjectId)
+		console.log(`[GeminiCLI] DEBUG - geminiCliOAuthPath:`, options.geminiCliOAuthPath)
+		console.log(`[GeminiCLI] DEBUG - GOOGLE_CLOUD_PROJECT env var:`, process.env.GOOGLE_CLOUD_PROJECT)
 	}
 
 	/**
@@ -127,18 +133,39 @@ export class GeminiCliHandler implements ApiHandler {
 	 * Discover or retrieve the project ID
 	 */
 	private async discoverProjectId(): Promise<string> {
+		// DEBUG: Print environment variables
+		console.log(`[GeminiCLI] DEBUG - Environment Variables:`)
+		console.log(`[GeminiCLI] DEBUG - GOOGLE_CLOUD_PROJECT:`, process.env.GOOGLE_CLOUD_PROJECT)
+		console.log(`[GeminiCLI] DEBUG - NODE_ENV:`, process.env.NODE_ENV)
+		console.log(
+			`[GeminiCLI] DEBUG - All env vars starting with GOOGLE:`,
+			Object.keys(process.env)
+				.filter((key) => key.startsWith("GOOGLE"))
+				.reduce((obj, key) => ({ ...obj, [key]: process.env[key] }), {}),
+		)
+
 		// If we already have a project ID, use it
 		if (this.options.geminiCliProjectId) {
+			console.log(`[GeminiCLI] DEBUG - Using configured project ID:`, this.options.geminiCliProjectId)
 			return this.options.geminiCliProjectId
+		}
+
+		// Check if GOOGLE_CLOUD_PROJECT environment variable is set
+		if (process.env.GOOGLE_CLOUD_PROJECT) {
+			console.log(`[GeminiCLI] DEBUG - Using GOOGLE_CLOUD_PROJECT from env:`, process.env.GOOGLE_CLOUD_PROJECT)
+			this.projectId = process.env.GOOGLE_CLOUD_PROJECT
+			return this.projectId
 		}
 
 		// If we've already discovered it, return it
 		if (this.projectId) {
+			console.log(`[GeminiCLI] DEBUG - Using previously discovered project ID:`, this.projectId)
 			return this.projectId
 		}
 
 		// Start with a default project ID (can be anything for personal OAuth)
 		const initialProjectId = "default"
+		console.log(`[GeminiCLI] DEBUG - Using default project ID:`, initialProjectId)
 
 		// Prepare client metadata
 		const clientMetadata = {
