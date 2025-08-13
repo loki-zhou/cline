@@ -1,14 +1,14 @@
 {
-	"name": "claude-dev",
-	"displayName": "Cline",
+	"name": "super-agent",
+	"displayName": "super-agent",
 	"description": "Autonomous coding agent right in your IDE, capable of creating/editing files, running commands, using the browser, and more with your permission every step of the way.",
-	"version": "3.18.0",
+	"version": "0.0.1",
 	"icon": "assets/icons/icon.png",
 	"engines": {
 		"vscode": "^1.84.0"
 	},
 	"author": {
-		"name": "Cline Bot Inc."
+		"name": "zhouzhou"
 	},
 	"license": "Apache-2.0",
 	"publisher": "saoudrizwan",
@@ -371,6 +371,7 @@
 		"@types/clone-deep": "^4.0.4",
 		"@types/diff": "^5.2.1",
 		"@types/get-folder-size": "^3.0.4",
+		"@types/json-schema": "^7.0.15",
 		"@types/mocha": "^10.0.7",
 		"@types/node": "20.x",
 		"@types/pdf-parse": "^1.1.4",
