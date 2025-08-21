@@ -125,7 +125,7 @@ impl ConfigManager {
     
     /// 获取Node.js脚本路径
     pub fn get_node_script_path(&self, _app_dir: &PathBuf) -> PathBuf {
-        // 在开发模式下，使用项目根目录中的脚本
+        // 在开发模式下，使用项目根目录中的编译后的cline-core.js
         let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         // 如果当前目录是 src-tauri，则回到上级目录
         let project_root = if current_dir.file_name().and_then(|n| n.to_str()) == Some("src-tauri") {
@@ -133,6 +133,6 @@ impl ConfigManager {
         } else {
             current_dir
         };
-        project_root.join("standalone").join("runtime-files").join("index.js")
+        project_root.join("dist-standalone").join("cline-core.js")
     }
 }
