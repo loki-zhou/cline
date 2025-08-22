@@ -204,6 +204,7 @@ export const ExtensionStateContextProvider: React.FC<{
 		useAutoCondense: true,
 	})
 	const [didHydrateState, setDidHydrateState] = useState(false)
+	console.log("🏁 ExtensionStateContext: didHydrateState initialized to:", didHydrateState)
 	const [showWelcome, setShowWelcome] = useState(false)
 	const [theme, setTheme] = useState<Record<string, string>>()
 	const [openRouterModels, setOpenRouterModels] = useState<Record<string, ModelInfo>>({

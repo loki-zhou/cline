@@ -42,19 +42,26 @@ export class CacheService {
 	 * Initialize the cache by loading data from disk
 	 */
 	async initialize(): Promise<void> {
+		console.log("[DEBUG] Initializing CacheService...")
 		try {
 			// Load all extension state from disk
+			console.log("[DEBUG] Reading state from disk...")
 			const state = await readStateFromDisk(this.context)
 
 			if (state) {
+				console.log("[DEBUG] State loaded successfully, populating cache...")
 				// Populate the caches with all extension state fields
 				// Use populate method to avoid triggering persistence during initialization
 				this.populateCache(state)
+				console.log("[DEBUG] Cache populated successfully")
+			} else {
+				console.log("[DEBUG] No state returned from readStateFromDisk")
 			}
 
 			this.isInitialized = true
+			console.log("[DEBUG] CacheService initialized successfully")
 		} catch (error) {
-			console.error("Failed to initialize CacheService:", error)
+			console.error("[DEBUG] Failed to initialize CacheService:", error)
 			throw error
 		}
 	}

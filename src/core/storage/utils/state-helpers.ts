@@ -12,7 +12,10 @@ import { UserInfo } from "@/shared/UserInfo"
 import { SecretKey } from "../state-keys"
 
 export async function readStateFromDisk(context: ExtensionContext) {
+	console.log("[DEBUG] Reading state from disk...")
+
 	// Get all global state values
+	console.log("[DEBUG] Reading global state values...")
 	const strictPlanModeEnabled = context.globalState.get("strictPlanModeEnabled") as boolean | undefined
 	const useAutoCondense = context.globalState.get("useAutoCondense") as boolean | undefined
 	const isNewUser = context.globalState.get("isNewUser") as boolean | undefined
@@ -252,7 +255,7 @@ export async function readStateFromDisk(context: ExtensionContext) {
 		}
 	}
 
-	return {
+	const result = {
 		apiConfiguration: {
 			apiKey,
 			openRouterApiKey,
@@ -413,6 +416,13 @@ export async function readStateFromDisk(context: ExtensionContext) {
 		localCursorRulesToggles: localCursorRulesToggles || {},
 		localWorkflowToggles: localWorkflowToggles || {},
 	}
+
+	console.log("[DEBUG] State loaded successfully")
+	console.log(`[DEBUG] API Key present: ${!!apiKey}`)
+	console.log(`[DEBUG] Mode: ${mode || "act"}`)
+	console.log(`[DEBUG] Strict Plan Mode: ${strictPlanModeEnabled ?? true}`)
+
+	return result
 }
 
 export async function resetWorkspaceState(controller: Controller) {
