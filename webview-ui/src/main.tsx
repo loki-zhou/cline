@@ -88,6 +88,19 @@ listen("grpc-response", (e) => {
 	}
 })
 
+// 新增：监听 state-update，保持与 ProtoBus 的 window.message 兼容
+listen("state-update", (e) => {
+	try {
+		const payload = e.payload as any
+		// 不打印日志，避免双日志
+		window.dispatchEvent(new MessageEvent("message", { data: payload }))
+	} catch (err) {
+		if (window.console && window.console.error) {
+			window.console.error("❌ Error handling state-update:", err)
+		}
+	}
+})
+
 // 批量日志：将后端 100ms 批量的日志打印到控制台
 listen("cline-stdout-batch", (e) => {
 	const lines = (e.payload as string[]) || []
