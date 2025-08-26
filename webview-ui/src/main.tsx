@@ -46,6 +46,66 @@ listen("cline-core-ready", () => {
 	}
 })
 
+// 启动即查询后端就绪状态，避免事件丢失导致等待
+if (window.__TAURI__) {
+	invoke("get_services_ready_status")
+		.then((status: any) => {
+			try {
+				if (status?.cline_core && !isClineCoreReady) {
+					if (window.console && window.console.log) {
+						window.console.log("⚡ cline-core already ready at startup, flushing queued messages")
+					}
+					isClineCoreReady = true
+					while (messageQueue.length > 0) {
+						const message = messageQueue.shift()
+						if (message) {
+							if (window.console && window.console.log) {
+								window.console.log("📤 Processing queued message (startup ready):", message.slice(0, 200))
+							}
+							window.standalonePostMessage?.(message)
+						}
+					}
+				}
+			} catch {}
+		})
+		.catch(() => {})
+}
+
+// 监听后端 gRPC 响应事件并转发为 window MessageEvent，保持兼容
+listen("grpc-response", (e) => {
+	try {
+		const payload = e.payload as any
+		if (window.console && window.console.log) {
+			window.console.log("📩 [grpc-response] payload:", payload)
+		}
+		// 转发为前端现有的 window.message 流
+		window.dispatchEvent(new MessageEvent("message", { data: payload }))
+	} catch (err) {
+		if (window.console && window.console.error) {
+			window.console.error("❌ Error handling grpc-response:", err)
+		}
+	}
+})
+
+// 批量日志：将后端 100ms 批量的日志打印到控制台
+listen("cline-stdout-batch", (e) => {
+	const lines = (e.payload as string[]) || []
+	if (lines.length && window.console && window.console.log) {
+		for (const line of lines) {
+			window.console.log("[cline-core]", line)
+		}
+	}
+})
+
+listen("cline-stderr-batch", (e) => {
+	const lines = (e.payload as string[]) || []
+	if (lines.length && window.console && window.console.error) {
+		for (const line of lines) {
+			window.console.error("[cline-core]", line)
+		}
+	}
+})
+
 // 添加超时机制 - 如果 10 秒后 cline-core 仍未就绪，强制设置为就绪状态
 setTimeout(() => {
 	if (!isClineCoreReady) {
