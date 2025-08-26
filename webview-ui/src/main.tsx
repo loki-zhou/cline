@@ -75,10 +75,11 @@ if (window.__TAURI__) {
 listen("grpc-response", (e) => {
 	try {
 		const payload = e.payload as any
-		if (window.console && window.console.log) {
-			window.console.log("📩 [grpc-response] payload:", payload)
+		// 仅在非流式(unary)时打印，避免“看起来两次”的日志噪音
+		if (window.console && window.console.log && payload?.grpc_response?.is_streaming === false) {
+			window.console.log("📩 [grpc-response] unary payload:", payload)
 		}
-		// 转发为前端现有的 window.message 流
+		// 始终转发为 window.message，保持 ProtoBus 兼容
 		window.dispatchEvent(new MessageEvent("message", { data: payload }))
 	} catch (err) {
 		if (window.console && window.console.error) {
