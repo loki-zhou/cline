@@ -11,6 +11,7 @@ declare global {
 		// Standalone 环境相关
 		__is_standalone__?: boolean
 		standalonePostMessage?: (message: string) => void
+		isAppClosing?: boolean // 新增：应用关闭标志
 
 		// Cline 应用相关
 		clineClientId?: string

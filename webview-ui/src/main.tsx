@@ -28,6 +28,17 @@ if (window.console && window.console.log) {
 let isClineCoreReady = false
 const messageQueue: string[] = []
 
+// 新增：应用关闭标志
+let isAppClosing = false
+
+// 新增：监听应用关闭事件
+listen("app-will-close", () => {
+	if (window.console && window.console.log) {
+		window.console.log("🔴 Received app-will-close event. Halting all further communication.")
+	}
+	isAppClosing = true
+})
+
 // 监听来自后端的就绪事件
 listen("cline-core-ready", () => {
 	if (window.console && window.console.log) {
@@ -143,6 +154,14 @@ setTimeout(() => {
 
 // 设置 standalone postMessage 函数
 window.standalonePostMessage = async (message: string) => {
+	// 如果应用正在关闭，则立即中止所有新的消息发送
+	if (isAppClosing) {
+		if (window.console && window.console.warn) {
+			window.console.warn("⚠️ App is closing, message dropped:", message.slice(0, 200))
+		}
+		return
+	}
+
 	if (!isClineCoreReady) {
 		if (window.console && window.console.log) {
 			window.console.log("🕒 cline-core not ready, queuing message:", message.slice(0, 200))
